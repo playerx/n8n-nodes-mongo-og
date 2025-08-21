@@ -14,7 +14,7 @@ import { NodeApiError, NodeConnectionType, NodeOperationError } from 'n8n-workfl
 export class Mongo implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Mongo Node (OG)',
-		name: 'mongoNodeOG',
+		name: 'mongoNodeOg',
 		icon: 'file:mongo.svg',
 
 		group: ['transform'],
@@ -59,10 +59,10 @@ export class Mongo implements INodeType {
 					{ name: 'insertMany', value: 'insertMany' },
 
 					// read
-					{ name: 'find', value: 'find' },
+					{ name: 'Find', value: 'find' },
 					{ name: 'findOne', value: 'findOne' },
 					{ name: 'findOneAndUpdate', value: 'findOneAndUpdate' },
-					{ name: 'aggregate', value: 'aggregate' },
+					{ name: 'Aggregate', value: 'aggregate' },
 
 					// update
 					{ name: 'updateOne', value: 'updateOne' },
@@ -76,7 +76,7 @@ export class Mongo implements INodeType {
 					// other
 					{ name: 'countDocuments', value: 'countDocuments' },
 					{ name: 'estimatedDocumentCount', value: 'estimatedDocumentCount' },
-					{ name: 'distinct', value: 'distinct' },
+					{ name: 'Distinct', value: 'distinct' },
 					{ name: 'bulkWrite', value: 'bulkWrite' },
 				],
 				default: 'find',
@@ -235,7 +235,11 @@ export class Mongo implements INodeType {
 						displayName: 'Limit',
 						name: 'limit',
 						type: 'number',
-						default: 10,
+						typeOptions: {
+							minValue: 1,
+						},
+						description: 'Max number of results to return',
+						default: 50,
 						displayOptions: {
 							show: {
 								op: ['find'],
@@ -266,7 +270,7 @@ export class Mongo implements INodeType {
 			},
 
 			{
-				displayName: 'Options',
+				displayName: 'Update Fields',
 				name: 'updateOptions',
 				type: 'collection',
 				default: {},
@@ -292,15 +296,15 @@ export class Mongo implements INodeType {
 						displayName: 'ArrayFilters',
 						name: 'arrayFilters',
 						type: 'number',
-						default: '[]',
+						default: 0,
 					},
 					{
 						displayName: 'ReturnDocument',
 						name: 'returnDocument',
 						type: 'options',
 						options: [
-							{ name: 'before', value: 'before' },
-							{ name: 'after', value: 'after' },
+							{ name: 'Before', value: 'before' },
+							{ name: 'After', value: 'after' },
 						],
 						default: 'after',
 						displayOptions: {
@@ -317,7 +321,7 @@ export class Mongo implements INodeType {
 						default: '',
 					},
 					{
-						displayName: 'upsert',
+						displayName: 'Upsert',
 						name: 'upsert',
 						type: 'boolean',
 						default: false,
@@ -329,10 +333,10 @@ export class Mongo implements INodeType {
 				displayName: 'Advanced',
 				name: 'advancedOptions',
 				type: 'collection',
-				default: '{ "runInTransaction": false }',
+				default: {},
 				options: [
 					{
-						displayName: 'Run in single transaction',
+						displayName: 'Run in Single Transaction',
 						name: 'runInTransaction',
 						hint: 'Can be used only with replica-set',
 						type: 'boolean',
