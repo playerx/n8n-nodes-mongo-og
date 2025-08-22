@@ -125,7 +125,7 @@ export const mongoProperties: INodeProperties[] = [
 		name: 'update',
 		type: 'json',
 		placeholder: 'update',
-		default: '{ $set: {} }',
+		default: '{ "$set": {} }',
 		displayOptions: {
 			show: {
 				op: ['updateOne', 'updateMany', 'findOneAndUpdate'],
@@ -174,13 +174,13 @@ export const mongoProperties: INodeProperties[] = [
 				displayName: 'Projection',
 				name: 'projection',
 				type: 'json',
-				default: '{ _id: 0 }',
+				default: '{ "_id": 0 }',
 			},
 			{
 				displayName: 'Sort',
 				name: 'sort',
 				type: 'json',
-				default: '{ _id: -1 }',
+				default: '{ "_id": -1 }',
 			},
 			{
 				displayName: 'Hint',
@@ -220,13 +220,13 @@ export const mongoProperties: INodeProperties[] = [
 				displayName: 'Projection',
 				name: 'projection',
 				type: 'json',
-				default: '{ _id: 0 }',
+				default: '{ "_id": 0 }',
 			},
 			{
 				displayName: 'Sort',
 				name: 'sort',
 				type: 'json',
-				default: '{ _id: -1 }',
+				default: '{ "_id": -1 }',
 			},
 			{
 				displayName: 'Skip',
