@@ -74,6 +74,7 @@ export const mongoProperties: INodeProperties[] = [
 					'deleteMany',
 					'find',
 					'findOne',
+					'findOneAndUpdate',
 					'countDocuments',
 					'distinct',
 				],
