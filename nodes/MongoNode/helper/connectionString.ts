@@ -1,24 +1,16 @@
-import {
-	ICredentialDataDecryptedObject,
-	IExecuteFunctions,
-	NodeOperationError,
-} from 'n8n-workflow';
+import { ICredentialDataDecryptedObject } from 'n8n-workflow';
 
 export function validateAndResolveMongoCredentials(
-	self: IExecuteFunctions,
 	credentials?: ICredentialDataDecryptedObject,
 ): IMongoCredentials {
 	if (credentials === undefined) {
-		throw new NodeOperationError(self.getNode(), 'No credentials got returned!');
-	} else {
-		return buildMongoConnectionParams(self, credentials as unknown as IMongoCredentialsType);
+		throw new Error('No credentials');
 	}
+
+	return buildMongoConnectionParams(credentials as unknown as IMongoCredentialsType);
 }
 
-function buildMongoConnectionParams(
-	self: IExecuteFunctions,
-	credentials: IMongoCredentialsType,
-): IMongoCredentials {
+function buildMongoConnectionParams(credentials: IMongoCredentialsType): IMongoCredentials {
 	const sanitizedDbName =
 		credentials.database && credentials.database.trim().length > 0
 			? credentials.database.trim()
@@ -30,10 +22,7 @@ function buildMongoConnectionParams(
 				database: sanitizedDbName,
 			};
 		} else {
-			throw new NodeOperationError(
-				self.getNode(),
-				'Cannot override credentials: valid MongoDB connection string not provided ',
-			);
+			throw new Error('Cannot override credentials: valid MongoDB connection string not provided ');
 		}
 	} else {
 		return {
