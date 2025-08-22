@@ -29,7 +29,7 @@ export class Mongo implements INodeType {
 		outputs: [NodeConnectionType.Main],
 		credentials: [
 			{
-				name: 'mongoDb',
+				name: 'mongoDbOg',
 				required: true,
 			},
 		],
@@ -59,10 +59,10 @@ export class Mongo implements INodeType {
 					{ name: 'insertMany', value: 'insertMany' },
 
 					// read
-					{ name: 'Find', value: 'find' },
+					{ name: 'find', value: 'find' },
 					{ name: 'findOne', value: 'findOne' },
 					{ name: 'findOneAndUpdate', value: 'findOneAndUpdate' },
-					{ name: 'Aggregate', value: 'aggregate' },
+					{ name: 'aggregate', value: 'aggregate' },
 
 					// update
 					{ name: 'updateOne', value: 'updateOne' },
@@ -76,7 +76,7 @@ export class Mongo implements INodeType {
 					// other
 					{ name: 'countDocuments', value: 'countDocuments' },
 					{ name: 'estimatedDocumentCount', value: 'estimatedDocumentCount' },
-					{ name: 'Distinct', value: 'distinct' },
+					{ name: 'distinct', value: 'distinct' },
 					{ name: 'bulkWrite', value: 'bulkWrite' },
 				],
 				default: 'find',
@@ -199,7 +199,7 @@ export class Mongo implements INodeType {
 
 			{
 				displayName: 'Options',
-				name: 'findOptions',
+				name: 'findOneOptions',
 				type: 'collection',
 				default: {},
 				displayOptions: {
@@ -219,32 +219,6 @@ export class Mongo implements INodeType {
 						name: 'sort',
 						type: 'json',
 						default: '{ _id: -1 }',
-					},
-					{
-						displayName: 'Skip',
-						name: 'skip',
-						type: 'number',
-						default: 0,
-						displayOptions: {
-							show: {
-								op: ['find'],
-							},
-						},
-					},
-					{
-						displayName: 'Limit',
-						name: 'limit',
-						type: 'number',
-						typeOptions: {
-							minValue: 1,
-						},
-						description: 'Max number of results to return',
-						default: 50,
-						displayOptions: {
-							show: {
-								op: ['find'],
-							},
-						},
 					},
 					{
 						displayName: 'Hint',
@@ -270,13 +244,120 @@ export class Mongo implements INodeType {
 			},
 
 			{
-				displayName: 'Update Fields',
+				displayName: 'Options',
+				name: 'findOptions',
+				type: 'collection',
+				default: {},
+				displayOptions: {
+					show: {
+						op: ['find'],
+					},
+				},
+				options: [
+					{
+						displayName: 'Projection',
+						name: 'projection',
+						type: 'json',
+						default: '{ _id: 0 }',
+					},
+					{
+						displayName: 'Sort',
+						name: 'sort',
+						type: 'json',
+						default: '{ _id: -1 }',
+					},
+					{
+						displayName: 'Skip',
+						name: 'skip',
+						type: 'number',
+						default: 0,
+					},
+					{
+						displayName: 'Limit',
+						name: 'limit',
+						type: 'number',
+						typeOptions: {
+							minValue: 1,
+						},
+						description: 'Max number of results to return',
+						default: 50,
+					},
+					{
+						displayName: 'Hint',
+						hint: 'Force Index',
+						name: 'hint',
+						type: 'string',
+						default: '',
+					},
+					{
+						displayName: 'Collation',
+						name: 'collation',
+						type: 'string',
+						default: '',
+					},
+					{
+						displayName: 'Batch Size',
+						name: 'batchSize',
+						hint: 'Number of docs per batch',
+						type: 'number',
+						default: 50,
+					},
+				],
+			},
+
+			{
+				displayName: 'Options',
 				name: 'updateOptions',
 				type: 'collection',
 				default: {},
 				displayOptions: {
 					show: {
-						op: ['updateOne', 'updateMany', 'findOneAndUpdate'],
+						op: ['updateOne', 'updateMany'],
+					},
+				},
+				options: [
+					{
+						displayName: 'Projection',
+						name: 'projection',
+						type: 'json',
+						default: '{ _id: 0 }',
+					},
+					{
+						displayName: 'Sort',
+						name: 'sort',
+						type: 'json',
+						default: '{ _id: -1 }',
+					},
+					{
+						displayName: 'ArrayFilters',
+						name: 'arrayFilters',
+						type: 'number',
+						default: 0,
+					},
+					{
+						displayName: 'Hint',
+						hint: 'Force Index',
+						name: 'hint',
+						type: 'string',
+						default: '',
+					},
+					{
+						displayName: 'Upsert',
+						name: 'upsert',
+						type: 'boolean',
+						default: false,
+					},
+				],
+			},
+
+			{
+				displayName: 'Options',
+				name: 'findOneAndUpdateOptions',
+				type: 'collection',
+				default: {},
+				displayOptions: {
+					show: {
+						op: ['findOneAndUpdate'],
 					},
 				},
 				options: [
@@ -307,11 +388,6 @@ export class Mongo implements INodeType {
 							{ name: 'After', value: 'after' },
 						],
 						default: 'after',
-						displayOptions: {
-							show: {
-								op: ['findOneAndUpdate'],
-							},
-						},
 					},
 					{
 						displayName: 'Hint',
@@ -329,21 +405,21 @@ export class Mongo implements INodeType {
 				],
 			},
 
-			{
-				displayName: 'Advanced',
-				name: 'advancedOptions',
-				type: 'collection',
-				default: {},
-				options: [
-					{
-						displayName: 'Run in Single Transaction',
-						name: 'runInTransaction',
-						hint: 'Can be used only with replica-set',
-						type: 'boolean',
-						default: false,
-					},
-				],
-			},
+			// {
+			// 	displayName: 'Advanced',
+			// 	name: 'advancedOptions',
+			// 	type: 'collection',
+			// 	default: {},
+			// 	options: [
+			// 		{
+			// 			displayName: 'Run in Single Transaction',
+			// 			name: 'runInTransaction',
+			// 			hint: 'Can be used only with replica-set',
+			// 			type: 'boolean',
+			// 			default: false,
+			// 		},
+			// 	],
+			// },
 		],
 	};
 
@@ -407,11 +483,11 @@ export class Mongo implements INodeType {
 
 						case 'findOne': {
 							const filter: any = this.getNodeParameter('filter', i, '{}', { ensureType: 'json' });
-							const findOptions: any = this.getNodeParameter('findOptions', i, '{}', {
+							const findOneOptions: any = this.getNodeParameter('findOneOptions', i, '{}', {
 								ensureType: 'json',
 							});
 
-							const res = await collection.findOne(filter, { ...findOptions, session });
+							const res = await collection.findOne(filter, { ...findOneOptions, session });
 
 							return res;
 						}
@@ -419,12 +495,17 @@ export class Mongo implements INodeType {
 						case 'findOneAndUpdate': {
 							const filter: any = this.getNodeParameter('filter', i, '{}', { ensureType: 'json' });
 							const update: any = this.getNodeParameter('update', i, '{}', { ensureType: 'json' });
-							const updateOptions: any = this.getNodeParameter('updateOptions', i, '{}', {
-								ensureType: 'json',
-							});
+							const findOneAndUpdateOptions: any = this.getNodeParameter(
+								'findOneAndUpdateOptions',
+								i,
+								'{}',
+								{
+									ensureType: 'json',
+								},
+							);
 
 							const res = await collection.findOneAndUpdate(filter, update, {
-								...updateOptions,
+								...findOneAndUpdateOptions,
 								session,
 							});
 
