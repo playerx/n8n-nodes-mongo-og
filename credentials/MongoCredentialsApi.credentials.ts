@@ -11,7 +11,7 @@ export class MongoCredentialsApi implements ICredentialType {
 			displayName: 'Connection String',
 			name: 'connectionString',
 			type: 'string',
-			typeOptions: { password: true },
+			typeOptions: {},
 			default: 'mongodb://localhost:27017',
 			placeholder: 'mongodb://username:password@host:port/database',
 			required: true,

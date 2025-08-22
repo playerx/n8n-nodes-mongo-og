@@ -1,15 +1,12 @@
 import { ClientSession, MongoClient } from 'mongodb';
 import type {
-	ICredentialDataDecryptedObject,
-	ICredentialsDecrypted,
-	ICredentialTestFunctions,
 	IExecuteFunctions,
-	INodeCredentialTestResult,
 	INodeExecutionData,
 	INodeType,
 	INodeTypeDescription,
 } from 'n8n-workflow';
-import { NodeApiError, NodeConnectionType, NodeOperationError } from 'n8n-workflow';
+import { NodeConnectionType, NodeOperationError } from 'n8n-workflow';
+import { validateAndResolveMongoCredentials } from './helper/validateAndResolveMongoCredentials';
 
 export class Mongo implements INodeType {
 	description: INodeTypeDescription = {
@@ -29,18 +26,11 @@ export class Mongo implements INodeType {
 		outputs: [NodeConnectionType.Main],
 		credentials: [
 			{
-				name: 'mongoDbOg',
+				name: 'mongoDb',
 				required: true,
 			},
 		],
 		properties: [
-			{
-				displayName: 'Database',
-				name: 'database',
-				type: 'string',
-				default: '',
-				description: 'Database name. If empty, uses the one from credentials (if provided in URI).',
-			},
 			{
 				displayName: 'Collection',
 				name: 'collection',
@@ -204,7 +194,7 @@ export class Mongo implements INodeType {
 				default: {},
 				displayOptions: {
 					show: {
-						op: ['find', 'findOne'],
+						op: ['findOne'],
 					},
 				},
 				options: [
@@ -425,8 +415,10 @@ export class Mongo implements INodeType {
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
-		const credential = await this.getCredentials('mongoDb');
-		const dbName = this.getNodeParameter('database', 0) as string;
+		const credentials = await this.getCredentials('mongoDb');
+
+		const { database, connectionString } = validateAndResolveMongoCredentials(this, credentials);
+
 		const collectionName = this.getNodeParameter('collection', 0) as string;
 		const advancedOptions = this.getNodeParameter(
 			'advancedOptions',
@@ -437,18 +429,12 @@ export class Mongo implements INodeType {
 
 		const runInTransaction = advancedOptions.runInTransaction ?? false;
 
-		if (!credential?.connectionString) {
-			throw new NodeApiError(this.getNode(), {
-				message: 'Missing MongoDB connection string in credentials.',
-			});
-		}
-
-		const client = new MongoClient(credential.connectionString as string);
+		const client = new MongoClient(connectionString);
 
 		try {
 			await client.connect();
 
-			const db = client.db(dbName || undefined);
+			const db = client.db(database);
 			const collection = db.collection(collectionName);
 
 			const action = async (session?: ClientSession) => {
@@ -664,52 +650,4 @@ export class Mongo implements INodeType {
 			await client.close().catch(() => {});
 		}
 	}
-
-	methods = {
-		credentialTest: {
-			test: <ICredentialTestFunction>(
-				_this: ICredentialTestFunctions,
-				credential: ICredentialsDecrypted<ICredentialDataDecryptedObject>,
-			): Promise<INodeCredentialTestResult> => {
-				return {
-					status: 'OK',
-					message: 'haha',
-				} as any;
-			},
-		},
-	} as any;
 }
-
-/**
- * Example input item JSONs:
- *
- * // Find
- * {
- *   "collection": "users",
- *   "op": "find",
- *   "filter": { "status": "active" },
- *   "projection": { "password": 0 },
- *   "sort": { "createdAt": -1 },
- *   "limit": 50,
- *   "skip": 0
- * }
- *
- * // Insert Many
- * { "collection": "users", "op": "insertMany", "docs": [{"name":"A"},{"name":"B"}] }
- *
- * // Update One
- * { "collection": "users", "op": "updateOne", "filter": {"_id": {"$oid": "..."}}, "update": {"$set": {"role": "admin"}} }
- *
- * // Aggregate
- * { "collection": "orders", "op": "aggregate", "pipeline": [ {"$match": {"status": "paid"}}, {"$group": {"_id": "$customerId", "total": {"$sum": "$amount"}}} ] }
- *
- * // Bulk Write
- * {
- *   "collection": "users",
- *   "op": "bulkWrite",
- *   "bulk": [
- *     { "insertOne": { "document": {"name": "Z"} } },
- *     { "updateOne": { "filter": {"email": "x@a.com"}, "update": {"$set": {"verified": true}}, "upsert": true } }
- *   ]
- * }
- */
