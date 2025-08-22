@@ -82,7 +82,16 @@ export class Mongo implements INodeType {
 						const filter: any = this.getNodeParameter('filter', i, '{}', { ensureType: 'json' });
 						const findOptions: any = this.getNodeParameter('findOptions', i, '{}', {
 							ensureType: 'json',
+							extractValue: true,
 						});
+
+						if (findOptions.projection) {
+							findOptions.projection = JSON.parse(findOptions.projection);
+						}
+
+						if (findOptions.sort) {
+							findOptions.sort = JSON.parse(findOptions.sort);
+						}
 
 						const res = await collection.find(filter, { ...findOptions, session }).toArray();
 
@@ -94,6 +103,14 @@ export class Mongo implements INodeType {
 						const findOneOptions: any = this.getNodeParameter('findOneOptions', i, '{}', {
 							ensureType: 'json',
 						});
+
+						if (findOneOptions.projection) {
+							findOneOptions.projection = JSON.parse(findOneOptions.projection);
+						}
+
+						if (findOneOptions.sort) {
+							findOneOptions.sort = JSON.parse(findOneOptions.sort);
+						}
 
 						const res = await collection.findOne(filter, { ...findOneOptions, session });
 
@@ -111,6 +128,14 @@ export class Mongo implements INodeType {
 								ensureType: 'json',
 							},
 						);
+
+						if (findOneAndUpdateOptions.projection) {
+							findOneAndUpdateOptions.projection = JSON.parse(findOneAndUpdateOptions.projection);
+						}
+
+						if (findOneAndUpdateOptions.sort) {
+							findOneAndUpdateOptions.sort = JSON.parse(findOneAndUpdateOptions.sort);
+						}
 
 						const res = await collection.findOneAndUpdate(filter, update, {
 							...findOneAndUpdateOptions,

@@ -43,7 +43,6 @@ export const mongoProperties: INodeProperties[] = [
 			{ name: 'bulkWrite', value: 'bulkWrite', action: 'bulkWrite' },
 		],
 		default: 'find',
-		description: 'If not set per item via `item.JSON.op`, this will be used',
 	},
 
 	{
@@ -280,18 +279,6 @@ export const mongoProperties: INodeProperties[] = [
 		},
 		options: [
 			{
-				displayName: 'Projection',
-				name: 'projection',
-				type: 'json',
-				default: '{ _id: 0 }',
-			},
-			{
-				displayName: 'Sort',
-				name: 'sort',
-				type: 'json',
-				default: '{ _id: -1 }',
-			},
-			{
 				displayName: 'ArrayFilters',
 				name: 'arrayFilters',
 				type: 'number',
@@ -324,18 +311,6 @@ export const mongoProperties: INodeProperties[] = [
 			},
 		},
 		options: [
-			{
-				displayName: 'Projection',
-				name: 'projection',
-				type: 'json',
-				default: '{ _id: 0 }',
-			},
-			{
-				displayName: 'Sort',
-				name: 'sort',
-				type: 'json',
-				default: '{ _id: -1 }',
-			},
 			{
 				displayName: 'ArrayFilters',
 				name: 'arrayFilters',
